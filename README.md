@@ -1,2 +1,4 @@
 # tzumi_utils
-Utilities for the Tzumi Magic TV device
+Various utilities for the Tzumi Magic TV device
+
+Written by Paul Bartholomew (oz_paulb)
