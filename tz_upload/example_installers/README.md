@@ -7,7 +7,7 @@ These installer scripts can do whatever they want - you risk BRICKING your devic
 
 You have been WARNED!
 
-# installer_add_hackme_user
+# installer_add_hackme_user.tgz
 Upload this file with tz_upload to add a user "hackme" with the password "hack1234"
 
 After this is run, you can ssh to your device with these credentials
