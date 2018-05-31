@@ -1,4 +1,6 @@
 # tzumi_utils
 Various utilities for the Tzumi Magic TV device
 
-Written by Paul Bartholomew (oz_paulb)
+Copyright (c) 2018 Paul Bartholomew (oz_paulb)
+
+Release under GPL 2
