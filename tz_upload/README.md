@@ -49,7 +49,7 @@ Next, the client uploads the .tgz file.  When the server receives the .tgz, it w
 
 If the sha1 hash matches what was expected, then the server responds with **"CHECK"**.  Otherwise, it responds with **"UCHEC"** indicating an error.
 
-On a successful upload, the server will then run **"tar xzvf"** on the received image (in "/tmp").  The .tgz file should have a single top-level directory with an "install" script inside, for example "installer/install.sh".
+On a successful upload, the server will then run **"tar xzvf"** on the received image (in "/tmp").  The .tgz file should have a single top-level directory with an "install.sh" script inside, for example "installer/install.sh".
 
 After the file is un-tarred, the server will run the **"/tmp/{directoryname}/install.sh"** script.  If the script wants to return a result back to the client, it should write it to a file called **"/tmp/run_result"**.  I believe the size of this result is limited - maybe to 4 bytes (so, maybe a numeric code and nothing more can be written here)
 
