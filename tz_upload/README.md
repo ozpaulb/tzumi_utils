@@ -43,11 +43,11 @@ For example, if we are uploading a .tgz file that's 218 bytes long, with a sha1 
 
 `"INFO<upload.tgz<218<c3f38066653248951fb45182f31140581ece9f6b"`
 
-After the client sends the INFO message to the server, the server responds with "READY".
+After the client sends the INFO message to the server, the server responds with **"READY"**.
 
 Next, the client uploads the .tgz file.  When the server receives the .tgz, it will calculate a sha1 hash of the receive file, and make sure it matches the value that came in the INFO message.
 
-If the sha1 hash matches what was expected, then the server responds with "CHECK".  Otherwise, it responds with "UCHEC" indicating an error.
+If the sha1 hash matches what was expected, then the server responds with **"CHECK"**.  Otherwise, it responds with **"UCHEC"** indicating an error.
 
 On a successful upload, the server will then run **"tar xzvf"** on the received image (in "/tmp").  The .tgz file should have a single top-level directory with an "install" script inside, for example "installer/install.sh".
 
