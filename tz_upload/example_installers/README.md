@@ -1,12 +1,14 @@
 # example_installers
 Example installer.tgz files to perform various operations on the device
 
-## test 1
+## WARNING!! WARNING!! WARNING!! WARNING!!
 
-this is test 1
+These installer scripts can do whatever they want - you risk BRICKING your device!
 
-### test 2
+You have been WARNED!
 
+# installer_add_hackme_user
+Upload this file with tz_upload to add a user "hackme" with the password "hack1234"
 
-this is test 2
+After this is run, you can ssh to your device with these credentials
 
