@@ -70,4 +70,7 @@ A simple example (not that this is helpful) would be to create your own "hosts" 
 
 `tz_loader ./hosts /etc/hosts`
 
-**tz_loader* recognizes the fact that you have specified a "target" filename (second argument), and will automatically prepend "../" to that in the INFO message.  The "./hosts" file will be uploaded to "/tmp/../etc/hosts", which is "/etc/hosts".  The "untar" in "/tmp" would fail, so the embedded "install.sh" would never be run.
+**tz_loader** recognizes the fact that you have specified a "target" filename (second argument), and will automatically prepend "../" to that in the INFO message.  The "./hosts" file will be uploaded to "/tmp/../etc/hosts", which is "/etc/hosts".  The "untar" in "/tmp" would fail, so the embedded "install.sh" would never be run.
+
+As I said, I have NOT tried the above.  You should also be careful about the resulting file permissions (*it's probably NOT a good idea to try to upload **"/etc/passwd"** and/or **"/etc/shadow"** files, for example!*).
+
