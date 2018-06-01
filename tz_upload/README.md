@@ -92,25 +92,47 @@ Here's the console output from the **Updateserver** app while uploading a simple
 1970-01-01-00-02-162: file name:upload.tgz
 
 1970-01-01-00-02-162: file size:218
+
 1970-01-01-00-02-162: file sha1:c3f38066653248951fb45182f31140581ece9f6b
+
 1970-01-01-00-02-162: read 218 bytes --- write 218 bytes
+
 1970-01-01-00-02-162: get file:upload.tgz
+
 success
+
 1970-01-01-00-02-162: save the file:/tmp/upload.tgz
+
 1970-01-01-00-02-162: file size:218
+
 1970-01-01-00-02-162: test size:218
+
 1970-01-01-00-02-162: file sha1:c3f38066653248951fb45182f31140581ece9f6b
+
 1970-01-01-00-02-162: test size:c3f38066653248951fb45182f31140581ece9f6b
+
 1970-01-01-00-02-162: check file success
+
 1970-01-01-00-02-162: getDirNameStart :cd /tmp && rm -f old.p new.p && touch old.p && touch new.p && ls > old.p
+
 installer/
+
 installer/install.sh
+
 1970-01-01-00-02-162: getDirName run1:cd /tmp && ls > new.p
+
 1970-01-01-00-02-162: getDirNamerun2:cd /tmp && grep -vFf old.p new.p
+
 1970-01-01-00-02-162: getDirNameEnd:cd /tmp && rm -f old.p new.p
+
 1970-01-01-00-02-162: getDirName result: installer
+
 1970-01-01-00-02-162: run: cd /tmp/installer && chmod +x install.sh && ./install.sh && rm -rf /tmp/installer /tmp/upload.tgz
+
 This is install.sh
+
 1970-01-01-00-02-163: run result:123
+
 1970-01-01-00-02-163: close the connect
+
 1970-01-01-00-02-163: listening...
