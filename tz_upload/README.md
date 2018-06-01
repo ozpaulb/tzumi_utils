@@ -75,7 +75,7 @@ A simple example (not that this is helpful) would be to create your own "hosts" 
 As I said, I have NOT tried the above.  You should also be careful about the resulting file permissions (*it's probably NOT a good idea to try to upload **"/etc/passwd"** and/or **"/etc/shadow"** files, for example!*).
 
 
-## example upload console output
+## Example upload console output
 
 Here's the console output from **/app/Updateserver** while uploading a simple installer .tgz file (one that just outputs "This is install.sh" to the console)
 
