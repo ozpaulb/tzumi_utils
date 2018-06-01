@@ -80,11 +80,17 @@ As I said, I have NOT tried the above.  You should also be careful about the res
 Here's the console output from the **Updateserver** app while uploading a simple installer .tgz file (one that just outputs "This is install.sh" to the console)
 
 1970-01-01-00-02-159: listening...
+
 1970-01-01-00-02-162: Client 192.168.1.214 connect success
+
 1970-01-01-00-02-162: Send the ready ack
+
 1970-01-01-00-02-162: Read info ack
+
 1970-01-01-00-02-162: Get the upload info:
+
 1970-01-01-00-02-162: file name:upload.tgz
+
 1970-01-01-00-02-162: file size:218
 1970-01-01-00-02-162: file sha1:c3f38066653248951fb45182f31140581ece9f6b
 1970-01-01-00-02-162: read 218 bytes --- write 218 bytes
