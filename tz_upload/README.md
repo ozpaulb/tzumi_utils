@@ -79,7 +79,7 @@ As I said, I have NOT tried the above.  You should also be careful about the res
 
 Here's the console output from the **Updateserver** app while uploading a simple installer .tgz file (one that just outputs "This is install.sh" to the console)
 
-1970-01-01-00-02-159: listening...
+`1970-01-01-00-02-159: listening...
 
 1970-01-01-00-02-162: Client 192.168.1.214 connect success
 
@@ -136,3 +136,4 @@ This is install.sh
 1970-01-01-00-02-163: close the connect
 
 1970-01-01-00-02-163: listening...
+`
