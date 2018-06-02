@@ -9,6 +9,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "sha1.h"
+
 #define	TZ_UPDATE_SERVER_IPADDR_DEFAULT		"192.168.1.1"
 #define	TZ_UPDATE_SERVER_PORT_DEFAULT		"6667"
 
@@ -17,11 +19,11 @@
 #define	TZ_UPDATE_SERVER_RESP_UPLOAD_SHA_GOOD	"CHECK"
 #define	TZ_UPDATE_SERVER_RESP_UPLOAD_SHA_BAD	"UCHEC"
 
+#define	TZ_UPDATE_SERVER_UPLOAD_CHUNK_SIZE	1024
 
 #define	TZ_UPDATE_CLIENT_RECV_TIMEOUT_SECONDS	5
 #define	TZ_UPDATE_CLIENT_SEND_TIMEOUT_SECONDS	5
 
-#define	SHA1SUM_STRING_LENGTH		40
 #define	IOBUF_LEN			4096
 
 //
@@ -123,7 +125,7 @@ tz_connect(const char *ipaddr_str, const char *port_str)
 		fprintf(stderr, "server failed to respond on connect()!\n");
 		return -1;
 	}
-	if (strcmp(io_buf, TZ_UPDATE_SERVER_RESP_CONNECT_STR)) {
+	if (strcmp((void *)io_buf, TZ_UPDATE_SERVER_RESP_CONNECT_STR)) {
 		fprintf(stderr, "server failed to respond with '%s' response!\n", TZ_UPDATE_SERVER_RESP_CONNECT_STR);
 		return -1;
 	}
@@ -150,12 +152,12 @@ tz_upload_file(int sockfd, const char *fname_in, const char *fname_target_in)
 	struct stat	st_buf;
 	size_t	filesize;
 	unsigned char	io_buf[IOBUF_LEN+1];
-	char	sha_buf[SHA1SUM_STRING_LENGTH+1];
 	FILE	*fh = NULL;
 	int	n;
-	unsigned char	*p_filebuf = NULL;
 	int	retval;
 	char	fname_target[IOBUF_LEN+1];
+	char	sha1_digest_str[SHA1_DIGEST_STRING_LEN+1];
+	unsigned char	file_io_chunk[TZ_UPDATE_SERVER_UPLOAD_CHUNK_SIZE];
 
 	if (fname_target_in) {
 		// if target filename specified, prepend "../" to get around
@@ -166,46 +168,26 @@ tz_upload_file(int sockfd, const char *fname_in, const char *fname_target_in)
 		strcpy(fname_target, "upload.tgz");
 	}
 
+
 	if (stat(fname_in, &st_buf) < 0) {
 		fprintf(stderr, "stat('%s') error (file not found?)!\n", fname_in);
 		goto exit_err;
 	}
 	filesize = st_buf.st_size;
+
+	// calculate the SHA1 digest of the file we're sending
+	printf("calculate file '%s' sha1sum...\n", fname_in);
+	if ((retval = SHA1_file(fname_in, sha1_digest_str)) < 0) {
+		fprintf(stderr, "sha1sum('%s') error)!\n", fname_in);
+		goto exit_err;
+	}
+
 	if (!(fh = fopen(fname_in, "r"))) {
 		fprintf(stderr, "fopen() failed!\n");
 		goto exit_err;
 	}
-	if (!(p_filebuf = (unsigned char *)malloc(filesize))) {
-		fprintf(stderr, "malloc() failed!\n");
-		goto exit_err;
-	}
-	if (fread((void *)p_filebuf, filesize, 1, fh) != 1) {
-		fprintf(stderr, "fread() failed!\n");
-		goto exit_err;
-	}
-	fclose(fh); fh = NULL;
 
-	sprintf(io_buf, "sha1sum %s", fname_in);
-
-	if (!(fh = popen(io_buf, "r"))) {
-		fprintf(stderr, "popen() failed!\n");
-		goto exit_err;
-	}
-	io_buf[0] = '\0';
-	if (!fgets(io_buf, sizeof(io_buf)-1, fh)) {
-		fprintf(stderr, "fgets() error!\n");
-		goto exit_err;
-	}
-	fclose(fh); fh = NULL;
-
-	if (strlen(io_buf) < SHA1SUM_STRING_LENGTH) {
-		fprintf(stderr, "sha1sum result error!\n");
-		goto exit_err;
-	}
-	strncpy(sha_buf, io_buf, SHA1SUM_STRING_LENGTH);
-	sha_buf[SHA1SUM_STRING_LENGTH] = '\0';
-	
-	sprintf(io_buf, "INFO<%s<%lu<%s", fname_target, filesize, sha_buf);
+	sprintf((void *)io_buf, "INFO<%s<%lu<%s", fname_target, filesize, sha1_digest_str);
 
 	if (send(sockfd, (void *)io_buf, strlen((void *)io_buf), 0) != strlen((void *)io_buf)) {
 		fprintf(stderr, "send(INFO) error!\n");
@@ -215,16 +197,32 @@ tz_upload_file(int sockfd, const char *fname_in, const char *fname_target_in)
 		fprintf(stderr, "server failed to respond on INFO!\n");
 		goto exit_err;
 	}
-	if (strcmp(io_buf, TZ_UPDATE_SERVER_RESP_UPLOAD_READY_STR)) {
+	if (strcmp((void *)io_buf, TZ_UPDATE_SERVER_RESP_UPLOAD_READY_STR)) {
 		fprintf(stderr, "server failed to respond with '%s' response!\n", TZ_UPDATE_SERVER_RESP_UPLOAD_READY_STR);
 		goto exit_err;
 	}
 
-	printf("sending file...\n");
-	if (send(sockfd, (void *)p_filebuf, filesize, 0) != filesize) {
-		fprintf(stderr, "send(FILE) error!\n");
+	printf("sending file '%s' (size=%lu, sha1sum='%s'... ", fname_in, filesize, sha1_digest_str); fflush(stdout);
+	while(1) {
+		n = fread((void *)file_io_chunk, 1, sizeof(file_io_chunk), fh);
+		if (n <= 0) {
+			break;
+		}
+		printf("."); fflush(stdout);
+		if (send(sockfd, (void *)file_io_chunk, n, 0) != n) {
+			fprintf(stderr, "send(FILE) error!\n");
+			goto exit_err;
+		}
+	}
+	printf("\n"); fflush(stdout);
+
+	fclose(fh); fh = NULL;
+
+	if (n < 0) {
+		fprintf(stderr, "file read error!\n");
 		goto exit_err;
 	}
+
 	if (tz_get_server_response(sockfd, (void *)io_buf, sizeof(io_buf)-1) < 0) {
 		fprintf(stderr, "server failed to respond on FILE!\n");
 		goto exit_err;
@@ -253,9 +251,6 @@ exit_err:
 	retval = -1;
 	// fallthru
 exit:
-	if (p_filebuf) {
-		free((void *)p_filebuf); p_filebuf = NULL;
-	}
 	if (fh) {
 		fclose(fh); fh = NULL;
 	}
